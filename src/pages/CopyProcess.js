@@ -46,8 +46,9 @@ export default function CopyProcess() {
     lat_macro: true,
     lon_macro: true,
     os_macro: true,
-    idfa_macro:true,
-    adid_macro:true,
+    idfa_macro: true,
+    ifa_macro: true,
+    adid_macro: true,
     usp_enabled: false,
     gdpr_enabled: false,
     gdpr_c_enabled: false,
@@ -165,6 +166,7 @@ export default function CopyProcess() {
       process_log: isLogChecked.process_log,
       lat_macro: processValues.lat_macro,
       idfa_macro: processValues.idfa_macro,
+      ifa_macro: processValues.ifa_macro,
       adid_macro: processValues.adid_macro,
       lon_macro: processValues.lon_macro,
       os_macro: processValues.os_macro,
@@ -180,7 +182,7 @@ export default function CopyProcess() {
       device_type: processValues.device_type,
     }
 
-    Object.keys(dataToSend).forEach(key => 
+    Object.keys(dataToSend).forEach(key =>
       dataToSend[key] === undefined && delete dataToSend[key]
     );
 
@@ -190,7 +192,7 @@ export default function CopyProcess() {
       let arr = [...processValues.hardmask].map((item) => item.id);
       dataToSend.hardmaskIds = arr;
     }
-console.log("data to send",dataToSend)
+    console.log("data to send", dataToSend)
     axios
       .post(
         `${process.env.REACT_APP_API_URI}/create-process`,
@@ -526,7 +528,7 @@ console.log("data to send",dataToSend)
                       </div>
                     </div>
                     <div className="space-y-2">
-                    <label className="block text-sm font-bold leading-6 textwhite">
+                      <label className="block text-sm font-bold leading-6 textwhite">
                         Publisher Id
                       </label>
                       <div className="mt-2">
@@ -548,7 +550,7 @@ console.log("data to send",dataToSend)
                     </div>
 
                     <div className="space-y-2">
-                    <label className="block text-sm font-bold leading-6 textwhite">
+                      <label className="block text-sm font-bold leading-6 textwhite">
                         Device Type
                       </label>
                       <div className="mt-2">
@@ -571,7 +573,7 @@ console.log("data to send",dataToSend)
 
 
                     <div className="space-y-2">
-                    <label className="block text-sm font-bold leading-6 textwhite">
+                      <label className="block text-sm font-bold leading-6 textwhite">
                         asi
                       </label>
                       <div className="mt-2">
@@ -593,7 +595,7 @@ console.log("data to send",dataToSend)
                     </div>
 
                     <div className="space-y-2">
-                    <label className="block text-sm font-bold leading-6 textwhite">
+                      <label className="block text-sm font-bold leading-6 textwhite">
                         hp
                       </label>
                       <div className="mt-2">
@@ -616,7 +618,7 @@ console.log("data to send",dataToSend)
 
 
                     <div className="space-y-2">
-                    <label className="block text-sm font-bold leading-6 textwhite">
+                      <label className="block text-sm font-bold leading-6 textwhite">
                         sid
                       </label>
                       <div className="mt-2">
@@ -635,282 +637,294 @@ console.log("data to send",dataToSend)
                           className="dropdown "
                         />
                       </div>
-                      </div>
+                    </div>
                   </div>
                 )}
-{!isRTBChecked && (
-                <div className="sm:col-span-6 space-y-4">
-                  <h4 className="text-lg font-medium textwhite">Privacy Settings</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {/* US Privacy */}
-                    <div>
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="usp_enabled"
-                          checked={processValues.usp_enabled}
-                          onChange={() => handleCheckboxChange('usp_enabled')}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                        />
-                        <label htmlFor="usp_enabled" className="ml-2 block text-sm textwhite">
-                          US Privacy
-                        </label>
+                {!isRTBChecked && (
+                  <div className="sm:col-span-6 space-y-4">
+                    <h4 className="text-lg font-medium textwhite">Privacy Settings</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {/* US Privacy */}
+                      <div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="usp_enabled"
+                            checked={processValues.usp_enabled}
+                            onChange={() => handleCheckboxChange('usp_enabled')}
+                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="usp_enabled" className="ml-2 block text-sm textwhite">
+                            US Privacy
+                          </label>
+                        </div>
+                        {processValues.usp_enabled && (
+                          <input
+                            name="usp"
+                            id="usp"
+                            value={processValues.usp}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-slate-700 textwhite"
+                          />
+                        )}
                       </div>
-                      {processValues.usp_enabled && (
-                        <input
-                          name="usp"
-                          id="usp"
-                          value={processValues.usp}
-                          onChange={handleInputChange}
-                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-slate-700 textwhite"
-                        />
-                      )}
-                    </div>
 
-                    {/* GDPR */}
-                    <div>
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="gdpr_enabled"
-                          checked={processValues.gdpr_enabled}
-                          onChange={() => handleCheckboxChange('gdpr_enabled')}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"/>
-                        <label htmlFor="gdpr_enabled" className="ml-2 block text-sm textwhite">
-                          GDPR
-                        </label>
+                      {/* GDPR */}
+                      <div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="gdpr_enabled"
+                            checked={processValues.gdpr_enabled}
+                            onChange={() => handleCheckboxChange('gdpr_enabled')}
+                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" />
+                          <label htmlFor="gdpr_enabled" className="ml-2 block text-sm textwhite">
+                            GDPR
+                          </label>
+                        </div>
+                        {processValues.gdpr_enabled && (
+                          <select
+                            name="gdpr"
+                            id="gdpr"
+                            value={processValues.gdpr}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-slate-700 textwhite"
+                          >
+                            <option value="">Select</option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                          </select>
+                        )}
                       </div>
-                      {processValues.gdpr_enabled && (
-                        <select
-                          name="gdpr"
-                          id="gdpr"
-                          value={processValues.gdpr}
-                          onChange={handleInputChange}
-                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-slate-700 textwhite"
-                        >
-                          <option value="">Select</option>
-                          <option value="0">0</option>
-                          <option value="1">1</option>
-                        </select>
-                      )}
-                    </div>
 
-                    {/* GDPR Consent */}
-                    <div>
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="gdpr_c_enabled"
-                          checked={processValues.gdpr_c_enabled}
-                          onChange={() => handleCheckboxChange('gdpr_c_enabled')}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                        />
-                        <label htmlFor="gdpr_c_enabled" className="ml-2 block text-sm textwhite">
-                          GDPR Consent
-                        </label>
+                      {/* GDPR Consent */}
+                      <div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="gdpr_c_enabled"
+                            checked={processValues.gdpr_c_enabled}
+                            onChange={() => handleCheckboxChange('gdpr_c_enabled')}
+                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="gdpr_c_enabled" className="ml-2 block text-sm textwhite">
+                            GDPR Consent
+                          </label>
+                        </div>
+                        {processValues.gdpr_c_enabled && (
+                          <select
+                            name="gdpr_c"
+                            id="gdpr_c"
+                            value={processValues.gdpr_c}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-slate-700 textwhite"
+                          >
+                            <option value="">Select</option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                          </select>
+                        )}
                       </div>
-                      {processValues.gdpr_c_enabled && (
-                        <select
-                          name="gdpr_c"
-                          id="gdpr_c"
-                          value={processValues.gdpr_c}
-                          onChange={handleInputChange}
-                          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-slate-700 textwhite"
-                        >
-                          <option value="">Select</option>
-                          <option value="0">0</option>
-                          <option value="1">1</option>
-                        </select>
-                      )}
-                    </div>
 
-                    {/* DNT */}
-                    <div>
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="dnt_enabled"
-                          checked={processValues.dnt_enabled}
-                          onChange={() => handleCheckboxChange('dnt_enabled')}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                        />
-                        <label htmlFor="dnt_enabled" className="ml-2 block text-sm textwhite">
-                          DNT
-                        </label>
+                      {/* DNT */}
+                      <div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="dnt_enabled"
+                            checked={processValues.dnt_enabled}
+                            onChange={() => handleCheckboxChange('dnt_enabled')}
+                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="dnt_enabled" className="ml-2 block text-sm textwhite">
+                            DNT
+                          </label>
+                        </div>
+                        {processValues.dnt_enabled && (
+                          <select
+                            name="dnt"
+                            id="dnt"
+                            value={processValues.dnt}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full pl-3 pr-10 py-2 dark:bg-slate-700 textwhite text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                          >
+                            <option value="">Select</option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                          </select>
+                        )}
                       </div>
-                      {processValues.dnt_enabled && (
-                        <select
-                          name="dnt"
-                          id="dnt"
-                          value={processValues.dnt}
-                          onChange={handleInputChange}
-                          className="mt-1 block w-full pl-3 pr-10 py-2 dark:bg-slate-700 textwhite text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                        >
-                          <option value="">Select</option>
-                          <option value="0">0</option>
-                          <option value="1">1</option>
-                        </select>
-                      )}
-                    </div>
 
-                    {/* SChain */}
-                    <div className="sm:col-span-2 md:col-span-3">
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="schain_enabled"
-                          checked={processValues.schain_enabled}
-                          onChange={() => handleCheckboxChange('schain_enabled')}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded "
-                        />
-                        <label htmlFor="schain_enabled" className="ml-2 block text-sm textwhite">
-                          SChain
-                        </label>
+                      {/* SChain */}
+                      <div className="sm:col-span-2 md:col-span-3">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="schain_enabled"
+                            checked={processValues.schain_enabled}
+                            onChange={() => handleCheckboxChange('schain_enabled')}
+                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded "
+                          />
+                          <label htmlFor="schain_enabled" className="ml-2 block text-sm textwhite">
+                            SChain
+                          </label>
+                        </div>
+                        {processValues.schain_enabled && (
+                          <input
+                            type="text"
+                            name="schain"
+                            placeholder="Enter schain"
+                            id="schain"
+                            value={processValues.schain}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full border dark:bg-slate-700 textwhite border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                          />
+                        )}
                       </div>
-                      {processValues.schain_enabled && (
-                        <input
-                          type="text"
-                          name="schain"
-                          placeholder="Enter schain"
-                          id="schain"
-                          value={processValues.schain}
-                          onChange={handleInputChange}
-                          className="mt-1 block w-full border dark:bg-slate-700 textwhite border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        />
-                      )}
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-<div className="sm:col-span-6 space-y-4">
-<h3 className="text-lg font-semibold textwhite mb-2">Additional Options</h3>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                        <div className="flex items-center space-x-2">
-                          <input 
-                            type="checkbox"
-                            id="lat_macro"
-                            name="lat_macro"
-                            checked={processValues.lat_macro}
-                            onChange={() => handleCheckboxChange('lat_macro')}
-                            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <label htmlFor="lat_macro" className="textwhite text-sm font-medium">Lat</label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <input 
-                            type="checkbox"
-                            id="lon_macro"
-                            name="lon_macro"
-                            checked={processValues.lon_macro}
-                            onChange={() => handleCheckboxChange('lon_macro')}
-                            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <label htmlFor="lon_macro" className="textwhite text-sm font-medium">Lon</label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <input 
-                            type="checkbox"
-                            id="os_macro"
-                            name="os_macro"
-                            checked={processValues.os_macro}
-                            onChange={() => handleCheckboxChange('os_macro')}
-                            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <label htmlFor="os_macro" className="textwhite text-sm font-medium">OS</label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <input 
-                            type="checkbox"
-                            id="idfa_macro"
-                            name="idfa_macro"
-                            checked={processValues.idfa_macro}
-                            onChange={() => handleCheckboxChange('idfa_macro')}
-                            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <label htmlFor="os_macro" className="textwhite text-sm font-medium">idfa</label>
-                        </div>
-
-                        <div className="flex items-center space-x-2">
-                          <input 
-                            type="checkbox"
-                            id="adid_macro"
-                            name="adid_macro"
-                            checked={processValues.adid_macro}
-                            onChange={() => handleCheckboxChange('adid_macro')}
-                            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <label htmlFor="os_macro" className="textwhite text-sm font-medium">adid</label>
-                        </div>
-                  
-                      </div>
+                <div className="sm:col-span-6 space-y-4">
+                  <h3 className="text-lg font-semibold textwhite mb-2">Additional Options</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="lat_macro"
+                        name="lat_macro"
+                        checked={processValues.lat_macro}
+                        onChange={() => handleCheckboxChange('lat_macro')}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="lat_macro" className="textwhite text-sm font-medium">Lat</label>
                     </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="lon_macro"
+                        name="lon_macro"
+                        checked={processValues.lon_macro}
+                        onChange={() => handleCheckboxChange('lon_macro')}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="lon_macro" className="textwhite text-sm font-medium">Lon</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="os_macro"
+                        name="os_macro"
+                        checked={processValues.os_macro}
+                        onChange={() => handleCheckboxChange('os_macro')}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="os_macro" className="textwhite text-sm font-medium">OS</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="idfa_macro"
+                        name="idfa_macro"
+                        checked={processValues.idfa_macro}
+                        onChange={() => handleCheckboxChange('idfa_macro')}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="os_macro" className="textwhite text-sm font-medium">idfa</label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="ifa_macro"
+                        name="ifa_macro"
+                        checked={processValues.ifa_macro}
+                        onChange={() => handleCheckboxChange('ifa_macro')}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="ifa_macro" className="textwhite text-sm font-medium">ifa</label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="adid_macro"
+                        name="adid_macro"
+                        checked={processValues.adid_macro}
+                        onChange={() => handleCheckboxChange('adid_macro')}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="os_macro" className="textwhite text-sm font-medium">adid</label>
+                    </div>
+
+                  </div>
+                </div>
 
                 <div className="sm:col-span-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <label htmlFor="os_type" className="block text-sm font-bold leading-6 textwhite">
-                    Select OS
-          </label>
-          <div className="mt-2">
-            <select
-              id="os_type"
-              name="os_type"
-              value={selectedOSId}
-              onChange={handleOSChange}
-              className={`dropdown`}
-            >
-              <option value="">Select OS</option>
-              {osList.map((os) => (
-                <option key={os.id} value={os.id} selected={os.name === processValues.os_type}>
-                  {os.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+                      Select OS
+                    </label>
+                    <div className="mt-2">
+                      <select
+                        id="os_type"
+                        name="os_type"
+                        value={selectedOSId}
+                        onChange={handleOSChange}
+                        className={`dropdown`}
+                      >
+                        <option value="">Select OS</option>
+                        {osList.map((os) => (
+                          <option key={os.id} value={os.id} selected={os.name === processValues.os_type}>
+                            {os.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
 
-        <div className="space-y-2">
-          <label htmlFor="ua_list" className="block text-sm font-bold leading-6 textwhite">
-            UA List
-          </label>
-          <div className="mt-2">
-            <select
-              id="ua_list"
-              name="ua_list"
-              value={uaList.find(ua => ua.name === processValues.ua_list)?.id || ""}
-              onChange={handleUAChange}
-              className={`dropdown`}
-              disabled={!selectedOSId}
-            >
-              <option value="">Select User Agent</option>
-              {uaList.map((ua) => (
-                <option key={ua.id} value={ua.id.toString()}>
-                  {ua.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+                  <div className="space-y-2">
+                    <label htmlFor="ua_list" className="block text-sm font-bold leading-6 textwhite">
+                      UA List
+                    </label>
+                    <div className="mt-2">
+                      <select
+                        id="ua_list"
+                        name="ua_list"
+                        value={uaList.find(ua => ua.name === processValues.ua_list)?.id || ""}
+                        onChange={handleUAChange}
+                        className={`dropdown`}
+                        disabled={!selectedOSId}
+                      >
+                        <option value="">Select User Agent</option>
+                        {uaList.map((ua) => (
+                          <option key={ua.id} value={ua.id.toString()}>
+                            {ua.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
 
-        <div className="space-y-2">
-          <label htmlFor="header" className="block text-sm font-bold leading-6 textwhite">
-            Select Header
-          </label>
-          <div className="mt-2">
-            <select
-              id="header"
-              name="header"
-              value={uniqueHeaders.find(h => h.aid.toString() === processValues.header)?.id || ""}
-              onChange={handleHeaderChange}
-              className="dropdown"
-            >
-              <option value="">Select Header</option>
-              {uniqueHeaders.map((header) => (
-                <option key={header.id} value={header.id.toString()}>
-                  {header.aname}
-                </option>
-              ))}
-            </select>
+                  <div className="space-y-2">
+                    <label htmlFor="header" className="block text-sm font-bold leading-6 textwhite">
+                      Select Header
+                    </label>
+                    <div className="mt-2">
+                      <select
+                        id="header"
+                        name="header"
+                        value={uniqueHeaders.find(h => h.aid.toString() === processValues.header)?.id || ""}
+                        onChange={handleHeaderChange}
+                        className="dropdown"
+                      >
+                        <option value="">Select Header</option>
+                        {uniqueHeaders.map((header) => (
+                          <option key={header.id} value={header.id.toString()}>
+                            {header.aname}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
 
@@ -1093,11 +1107,11 @@ console.log("data to send",dataToSend)
                       <span className="inline-block ml-2 animate-spin"><FaSpinner /></span>
                     )}
                   </button>
-                  <SaveButton 
-                processValues={processValues} 
-                isRTBChecked={isRTBChecked} 
-                hardmaskList={hardmaskList}
-              />
+                  <SaveButton
+                    processValues={processValues}
+                    isRTBChecked={isRTBChecked}
+                    hardmaskList={hardmaskList}
+                  />
                 </div>
               </div>
             </div>

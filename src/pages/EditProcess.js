@@ -48,6 +48,7 @@ export default function EditProcess() {
     lon_macro: true,
     os_macro: true,
     idfa_macro:true,
+    ifa_macro:true,
     adid_macro:true,
     usp_enabled: false,
     gdpr_enabled: false,
@@ -156,6 +157,7 @@ export default function EditProcess() {
       lat_macro: processValues.lat_macro,
       lon_macro: processValues.lon_macro,
       idfa_macro: processValues.idfa_macro,
+      ifa_macro:processValues.ifa_macro,
       adid_macro: processValues.adid_macro,
       os_macro: processValues.os_macro,
       usp: processValues.usp_enabled ? processValues.usp : undefined,
@@ -807,6 +809,18 @@ export default function EditProcess() {
                           />
                           <label htmlFor="os_macro" className="textwhite text-sm font-medium">idfa</label>
                         </div>
+
+                        <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="ifa_macro"
+                        name="ifa_macro"
+                        checked={processValues.ifa_macro}
+                        onChange={() => handleCheckboxChange('ifa_macro')}
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="ifa_macro" className="textwhite text-sm font-medium">ifa</label>
+                    </div>
 
                         <div className="flex items-center space-x-2">
                           <input 
