@@ -656,10 +656,9 @@ export default function UA() {
       </div>
 
       <div className="flex justify-between my-4">
-        <div className='flex justify-between border pt-2 px-2 rounded-lg graybg'>
+        {/* <div className='flex justify-between border pt-2 px-2 rounded-lg graybg'>
           <div><p className='textwhite font-semibold' >Download All : &nbsp; <br /> UserAgent</p></div>
           <div className=''>
-            {/* <label className="block mb-2 textwhite font-bold">OS Type</label> */}
             <select
               id="id"
               name="id"
@@ -686,7 +685,7 @@ export default function UA() {
               </span>)}
             </button>
           </div>
-        </div>
+        </div> */}
         <button
           onClick={handleUpdateUAServer}
           className="bg-blue-500 p-2 rounded-lg text-white hover:bg-blue-600"

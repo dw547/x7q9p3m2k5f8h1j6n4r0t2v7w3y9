@@ -41,7 +41,6 @@ function Application() {
       setAppValue(JSON.parse(storedData));
     }
     
-    // Fetch OS types from API
     axios.get(`${process.env.REACT_APP_API_URI}/get-all-os`, {
       headers: {
         Authorization: JSON.parse(localStorage.getItem("token")),
@@ -232,7 +231,7 @@ function Application() {
       return;
     }
     setIsDeleting(true);
-    axios.delete(`${process.env.REACT_APP_API_URI}/delete-hardmask`, {
+    axios.get(`${process.env.REACT_APP_API_URI}/delete-all-hardmask`, {
       params: { os: selectedManageOS === "all" ? "all" : selectedManageOS },
       headers: {
         Authorization: JSON.parse(localStorage.getItem("token")),

@@ -174,7 +174,7 @@ const Sidebar = ({ isSidebarCollapsed, toggleSidebar }) => {
                 </button>
               </li>)}
 
-            <li className="px-4 py-2 text-gray-900 dark:text-gray-100 dark:hover:graybg hover:bg-gray-300 rounded-md">
+            {/* <li className="px-4 py-2 text-gray-900 dark:text-gray-100 dark:hover:graybg hover:bg-gray-300 rounded-md">
               <button
                 className="flex items-center"
                 title="New Incoming"
@@ -185,7 +185,7 @@ const Sidebar = ({ isSidebarCollapsed, toggleSidebar }) => {
                 <FaRightToBracket size={24} />
                 {!isSidebarCollapsed && <span className="ml-2">New Incoming</span>}
               </button>
-            </li>
+            </li>  */}
 
             {isAdmin() && (
               <li className="px-4 py-2 text-gray-900 dark:text-gray-100 dark:hover:graybg hover:bg-gray-300 rounded-md">
