@@ -1,0 +1,31 @@
+@tailwind utilities;
+
+@layer utilities {
+  .graybg {
+    @apply bg-gray-100 dark:bg-gray-800;
+  }
+
+  .gray700 {
+    @apply bg-gray-200 dark:bg-gray-700;
+  }
+
+  .textwhite {
+    @apply text-black dark:text-white;
+  }
+
+  .input {
+    @apply w-full px-2 py-1 bg-gray-200 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white mb-4;
+  }
+
+  .dropdown {
+    @apply block w-full rounded-md bg-gray-200 py-1 px-2 border border-gray-300 dark:bg-gray-700 text-black dark:text-white shadow-sm sm:max-w-xs sm:text-sm sm:leading-6;
+  }
+
+  .zincbg {
+    @apply bg-gray-200 dark:bg-zinc-800
+  }
+
+  .lable {
+    @apply block text-sm font-bold leading-6 dark:text-white text-black
+  }
+}

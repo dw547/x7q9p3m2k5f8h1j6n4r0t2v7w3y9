@@ -1,0 +1,303 @@
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { FaEdit, FaTrash } from 'react-icons/fa';
+
+const vpnOptions = [
+  { name: "nine22" },
+  { name: "luna" },
+  { name: "webshare" },
+  { name: "pxs" }
+];
+
+export default function VPN() {
+  const [newVpn, setNewVpn] = useState('');
+  const [selectedVpn, setSelectedVpn] = useState('');
+  const [selectedIp, setSelectedIp] = useState('');
+  const [selectedLatlong, setSelectedLatlong] = useState('');
+  const [isDistinct, setIsDistinct] = useState(false);
+  const [ipList, setIpList] = useState([]);
+  const [latlongList, setLatlongList] = useState([]);
+  const [vpnList, setVpnList] = useState(vpnOptions);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = JSON.parse(localStorage.getItem("token"));
+        const headers = { Authorization: ` ${token}` };
+
+        const [ipResponse, latlongResponse] = await Promise.all([
+          axios.get(`${process.env.REACT_APP_API_URI}/get-all-ip`, { headers }),
+          axios.get(`${process.env.REACT_APP_API_URI}/get-all-latlong`, { headers })
+        ]);
+
+        setIpList(ipResponse.data);
+        setLatlongList(latlongResponse.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleAddVPN = async () => {
+    if (!newVpn.trim()) {
+      alert("Please enter a VPN name");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URI}/add-vpn`,
+        { vpn: newVpn },
+        {
+          headers: {
+            Authorization: ` ${JSON.parse(localStorage.getItem("token"))}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setVpnList([...vpnList, { name: newVpn }]);
+        setNewVpn('');
+        alert("VPN added successfully");
+      }
+    } catch (error) {
+      alert(error.response?.data?.message || "Error adding VPN");
+    }
+  };
+
+  const handleUpdateVPN = async (vpn) => {
+    const updatedName = prompt("Enter new name for VPN", vpn.name);
+    if (updatedName && updatedName !== vpn.name) {
+      try {
+        const response = await axios.put(
+          `${process.env.REACT_APP_API_URI}/update-vpn`,
+          { oldName: vpn.name, newName: updatedName },
+          {
+            headers: {
+              Authorization: ` ${JSON.parse(localStorage.getItem('token'))}`
+            }
+          }
+        );
+
+        if (response.status === 200) {
+          setVpnList(vpnList.map(v => v.name === vpn.name ? { ...v, name: updatedName } : v));
+          alert("VPN updated successfully");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Error updating VPN");
+      }
+    }
+  };
+
+  const handleDeleteVPN = async (vpn) => {
+    if (window.confirm(`Are you sure you want to delete ${vpn.name}?`)) {
+      try {
+        const response = await axios.delete(
+          `${process.env.REACT_APP_API_URI}/delete-vpn`,
+          {
+            data: { vpn: vpn.name },
+            headers: {
+              Authorization: ` ${JSON.parse(localStorage.getItem('token'))}`
+            }
+          }
+        );
+
+        if (response.status === 200) {
+          setVpnList(vpnList.filter(v => v.name !== vpn.name));
+          alert("VPN deleted successfully");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Error deleting VPN");
+      }
+    }
+  };
+
+  const handleSubmitDistinct = async () => {
+    if (!selectedVpn) {
+      alert("Please select a VPN");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URI}/check-distinct`,
+        {
+          vpn: selectedVpn,
+          ip: selectedIp,
+          latlong: selectedLatlong,
+          isDistinct: isDistinct
+        },
+        {
+          headers: {
+            Authorization: ` ${JSON.parse(localStorage.getItem('token'))}`
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        alert("Submitted successfully");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error submitting");
+    }
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6 space-y-8">
+      <div className='graybg rounded-lg p-6 shadow-lg'>
+        <h2 className='textwhite text-2xl font-bold mb-6'>Add/Update VPN</h2>
+
+        <div className='mb-6'>
+          <label className='block textwhite text-sm font-semibold mb-2' htmlFor="newVpn">
+            Enter New VPN
+          </label>
+          <div className="flex">
+            <input
+              id="newVpn"
+              type='text'
+              className='input flex-grow mr-2 p-2 rounded'
+              value={newVpn}
+              onChange={(e) => setNewVpn(e.target.value)}
+              placeholder="Enter VPN name"
+            />
+            <button 
+              onClick={handleAddVPN}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+            >
+              Add VPN
+            </button>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-blue-700">
+                <th className="px-4 py-2 text-left text-white">VPN Name</th>
+                <th className="px-4 py-2 text-right text-white">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {vpnList.map((item) => (
+                <tr key={item.name} className="border-b border-gray-600 hover:bg-gray-300 dark:hover:bg-gray-700 transition duration-300">
+                  <td className="px-4 py-3 textwhite">{item.name}</td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      onClick={() => handleUpdateVPN(item)}
+                      className="mr-2 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded transition duration-300 ease-in-out"
+                      title="Edit VPN"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteVPN(item)}
+                      className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded transition duration-300 ease-in-out"
+                      title="Delete VPN"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className='graybg rounded-lg p-6 shadow-lg'>
+        <h2 className='textwhite text-2xl font-bold mb-6'>Check Distinct</h2>
+        <div className='space-y-4'>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+            <div>
+              <label
+                htmlFor="vpn"
+                className="block text-sm font-semibold textwhite mb-2"
+              >
+                Select VPN
+              </label>
+              <select
+                id="vpn"
+                name="vpn"
+                value={selectedVpn}
+                onChange={(e) => setSelectedVpn(e.target.value)}
+                className="dropdown w-full  rounded"
+              >
+                <option value="">Select VPN</option>
+                {vpnOptions.map((vpn) => (
+                  <option key={vpn.name} value={vpn.name}>{vpn.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="ip"
+                className="block text-sm font-semibold textwhite mb-2"
+              >
+                Select IP
+              </label>
+              <select
+                id="ip"
+                name="ip"
+                value={selectedIp}
+                onChange={(e) => setSelectedIp(e.target.value)}
+                className="dropdown w-full  rounded"
+              >
+                <option value="">Select IP</option>
+                {ipList.map((ip) => (
+                  <option key={ip.name} value={ip.name}>{ip.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="latlong"
+                className="block text-sm font-semibold textwhite mb-2"
+              >
+                Select Latlong
+              </label>
+              <select
+                id="latlong"
+                name="latlong"
+                value={selectedLatlong}
+                onChange={(e) => setSelectedLatlong(e.target.value)}
+                className="dropdown w-full rounded"
+              >
+                <option value="">Select Lat Long</option>
+                {latlongList.map((latlong) => (
+                  <option key={latlong.name} value={latlong.name}>{latlong.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="distinct"
+              className="h-5 w-5 mr-2"
+              checked={isDistinct}
+              onChange={(e) => setIsDistinct(e.target.checked)}
+            />
+            <label htmlFor="distinct" className="text-sm font-semibold textwhite">
+              Distinct
+            </label>
+          </div>
+          
+          <button 
+            onClick={handleSubmitDistinct}
+            className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out w-full md:w-auto'
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
