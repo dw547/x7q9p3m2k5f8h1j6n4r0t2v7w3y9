@@ -347,20 +347,14 @@ export default function EditProcess() {
       } : {})
     }));
   };
-
-  const handleRemoveHardmask = (hardmaskId) => {
-    const updatedHardmaskList = hardmaskList.filter(
-      (item) => item.id !== hardmaskId
-    );
-    setHardmaskList(updatedHardmaskList);
-    setProcessValues((prevProcessValues) => ({
-      ...prevProcessValues,
-      hardmask: prevProcessValues.hardmask.filter(
-        (item) => item.id !== hardmaskId
-      ),
+  const handleRemoveHardmask = (index) => {
+    setHardmaskList(prevList => prevList.filter((_, i) => i !== index));
+    setProcessValues(prevValues => ({
+      ...prevValues,
+      hardmask: prevValues.hardmask.filter((_, i) => i !== index)
     }));
-
-    if (updatedHardmaskList.length === 0) {
+  
+    if (hardmaskList.length === 1) {
       setIsHardmaskSelected(false);
     }
   };
@@ -1088,11 +1082,11 @@ export default function EditProcess() {
                         {selected.appname}
                       </p>
                       <button
-                        onClick={() => handleRemoveHardmask(index)}
-                        className="bg-red-500 textwhite py-1 px-2 rounded"
-                      >
-                        <FiTrash2 />
-                      </button>
+  onClick={() => handleRemoveHardmask(index)}
+  className="bg-red-500 textwhite py-1 px-2 rounded"
+>
+  <FiTrash2 />
+</button>
                     </div>
                     {selected.showDetails && (
                       <div className="mt-2">

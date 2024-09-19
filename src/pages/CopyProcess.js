@@ -65,6 +65,49 @@ export default function CopyProcess() {
   const [availableServer, setAvailableServer] = useState([]);
 
   useEffect(() => {
+    const storedServer = localStorage.getItem("current_server");
+    if (storedServer) {
+      try {
+        const parsedServer = JSON.parse(storedServer);
+        setSelectedServer(parsedServer.server_name);
+      } catch (error) {
+        console.log("Error parsing stored server:");
+      }
+    } else {
+      axios
+        .get(`${process.env.REACT_APP_API_URI}/all-servers`, {
+          headers: {
+            Authorization: JSON.parse(localStorage.getItem("token")),
+          },
+        })
+        .then(function (response) {
+          localStorage.setItem(
+            "current_server",
+            JSON.stringify(response.data[0])
+          );
+        })
+        .catch(function (error) {
+          alert("Server Error");
+          navigate("/");
+          console.log(error);
+        });
+    }
+
+    axios
+      .get(`${process.env.REACT_APP_API_URI}/all-servers`, {
+        headers: {
+          Authorization: JSON.parse(localStorage.getItem("token")),
+        },
+      })
+      .then(function (response) {
+        setAvailableServer(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, []);
+
+  useEffect(() => {
     axios
       .get(`${process.env.REACT_APP_API_URI}/edit-process/${id}`, {
         headers: {
@@ -358,19 +401,14 @@ export default function CopyProcess() {
     }));
   };
 
-  const handleRemoveHardmask = (hardmaskId) => {
-    const updatedHardmaskList = hardmaskList.filter(
-      (item) => item.id !== hardmaskId
-    );
-    setHardmaskList(updatedHardmaskList);
-    setProcessValues((prevProcessValues) => ({
-      ...prevProcessValues,
-      hardmask: prevProcessValues.hardmask.filter(
-        (item) => item.id !== hardmaskId
-      ),
+  const handleRemoveHardmask = (index) => {
+    setHardmaskList(prevList => prevList.filter((_, i) => i !== index));
+    setProcessValues(prevValues => ({
+      ...prevValues,
+      hardmask: prevValues.hardmask.filter((_, i) => i !== index)
     }));
-
-    if (updatedHardmaskList.length === 0) {
+  
+    if (hardmaskList.length === 1) {
       setIsHardmaskSelected(false);
     }
   };
@@ -1140,11 +1178,11 @@ export default function CopyProcess() {
                         {selected.appname}
                       </p>
                       <button
-                        onClick={() => handleRemoveHardmask(index)}
-                        className="bg-red-500 textwhite py-1 px-2 rounded"
-                      >
-                        <FiTrash2 />
-                      </button>
+  onClick={() => handleRemoveHardmask(index)}
+  className="bg-red-500 textwhite py-1 px-2 rounded"
+>
+  <FiTrash2 />
+</button>
                     </div>
                     {selected.showDetails && (
                       <div className="mt-2">
