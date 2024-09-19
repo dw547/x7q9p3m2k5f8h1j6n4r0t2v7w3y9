@@ -17,6 +17,7 @@ export default function Process() {
     gdpr_c: "",
     schain: "",
     tick_rate: '',
+    hardmask_type: "Select All Hardmask",
     os_type: "Select OS",
     ua_list: "Select User Agent",
     vpn: "Select VPN",
@@ -221,7 +222,7 @@ export default function Process() {
     }
 
     if (
-      processValues.all_hardmask === "" &&
+      processValues.hardmask_type === "" &&
       processValues.hardmaskIds.length === 0
     ) {
       alert(
@@ -272,8 +273,8 @@ export default function Process() {
     );
 
 
-    if (selectAllHardmask) {
-      dataToSend.all_hardmask = processValues.ua_list;
+    if (processValues.hardmask_type) {
+      dataToSend.all_hardmask = processValues.hardmask_type;
     } else {
       dataToSend.hardmaskIds = processValues.hardmaskIds;
     }
@@ -384,13 +385,12 @@ export default function Process() {
   const handleAllHardmask = (e) => {
     setProcessValues({
       ...processValues,
-      all_hardmask: e.target.value,
-      hardmaskIds: [],
+      hardmask_type: e.target.value,
     });
-
-    setHardmaskList([]);
     setIsHardmaskSelected(false);
   };
+
+ 
 
   const handleVpnChange = (e) => {
     setProcessValues({
@@ -1058,7 +1058,7 @@ export default function Process() {
                       <select
                         id="all_hardmask"
                         name="all_hardmask"
-                        value={processValues.all_hardmask}
+                        value={processValues.hardmask_type}
                         onChange={handleAllHardmask}
                         disabled={isHardmaskSelected}
                         className={`block w-full rounded-md border-0 py-2 gray700 textwhite shadow-sm sm:max-w-xs sm:text-sm sm:leading-6 ${isHardmaskSelected
