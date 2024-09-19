@@ -273,9 +273,9 @@ export default function Process() {
     );
 
 
-    if (processValues.hardmask_type) {
+    if (processValues.hardmask_type && processValues.hardmask_type !== "Select All Hardmask") {
       dataToSend.all_hardmask = processValues.hardmask_type;
-    } else {
+    } else if (processValues.hardmaskIds.length > 0) {
       dataToSend.hardmaskIds = processValues.hardmaskIds;
     }
 
@@ -331,9 +331,9 @@ export default function Process() {
       setProcessValues((prevProcessValues) => ({
         ...prevProcessValues,
         hardmaskIds: [...prevProcessValues.hardmaskIds, payload.id],
-        all_hardmask: "",
+        hardmask_type: "", // Reset hardmask_type when individual hardmasks are selected
       }));
-
+  
       setHardmaskList((list) => [...list, { ...payload, showDetails: false }]);
       setIsHardmaskSelected(true);
       setSelectAllHardmask(false);
@@ -383,11 +383,14 @@ export default function Process() {
   // };
 
   const handleAllHardmask = (e) => {
+    const selectedValue = e.target.value;
     setProcessValues({
       ...processValues,
-      hardmask_type: e.target.value,
+      hardmask_type: selectedValue,
+      hardmaskIds: [], // Clear individual selections when "All Hardmask" is chosen
     });
-    setIsHardmaskSelected(false);
+    setIsHardmaskSelected(selectedValue !== "Select All Hardmask");
+    setHardmaskList([]); // Clear the hardmask list
   };
 
  
