@@ -65,7 +65,7 @@ function FileUploader() {
         <input
           id="fileInput"
           type="file"
-          accept=".xlsx, .xls"
+          accept=".xlsx, .xls,.csv"
           className="hidden"
           onChange={handleFileInput}
         />
