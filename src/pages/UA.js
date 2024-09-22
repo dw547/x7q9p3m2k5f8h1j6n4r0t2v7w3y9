@@ -304,7 +304,7 @@ export default function UA() {
         `${process.env.REACT_APP_API_URI}/create-os`,
         {
           name: newOS,
-          hardmask_types: hardmaskTypes.filter(type => type.trim() !== ""),
+          hardmask_type: hardmaskTypes.filter(type => type.trim() !== ""),
 
         },
         {
