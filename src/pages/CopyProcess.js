@@ -157,7 +157,11 @@ export default function CopyProcess() {
       },
     })
       .then((response) => {
-        setOsList(response.data);
+        setOsList(response.data.map(os => ({
+          id: os.id,
+          name: os.name,
+          hardmask_types: JSON.parse(os.hardmask_type)
+        })));
       })
       .catch((error) => {
         console.log(error);
@@ -287,18 +291,18 @@ export default function CopyProcess() {
     });
     setIsHardmaskSelected(false);
   };
-
+  
   const handleOSChange = (e) => {
     const selectedOSId = e.target.value;
     const selectedOSName = e.target.options[e.target.selectedIndex].text;
-    console.log(selectedOSName)
     setSelectedOSId(selectedOSId);
     setProcessValues(prev => ({
       ...prev,
       os_type: selectedOSName,
       ua_list: "",
+      hardmask_type: "", // Reset hardmask_type when OS changes
     }));
-
+  
     // Fetch UA list for the selected OS
     if (selectedOSId) {
       fetchUAList(selectedOSId);
@@ -979,57 +983,34 @@ export default function CopyProcess() {
                 </div>
                 {processValues.os_type !== "Select OS" && (
                   <>
-                    <div className="flex flex-col  sm:col-span-6">
-                      <label
-                        htmlFor="ua_list"
-                        className="block text-sm p-1 font-bold leading-6 textwhite"
-                      >
-                        All Hardmask Type
-                      </label>
-                      <select
-                        id="all_hardmask"
-                        name="all_hardmask"
-                        value={processValues.hardmask_type}
-                        onChange={handleAllHardmask}
-                        // disabled={isHardmaskSelected}
-                        // className={`block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6 ${isHardmaskSelected ? 'opacity-50 cursor-not-allowed' : ''
-                        //   }`}
-                        className={`block w-full rounded-md border-0 py-2 gray700 textwhite shadow-sm  sm:max-w-xs sm:text-sm sm:leading-6
-                          }`}
-                      >
-                        <option value="">Select All Hardmask</option>
-                        {processValues.os_type === "iOS" && (
-                          <>
-                            <option value="apple_ctv">apple_ctv</option>
-                            <option value="apple_inapp">apple_inapp</option>
-                          </>
-                        )}
-                        {processValues.os_type === "Android" && (
-                          <>
-                            <option value="android_inapp">android_inapp</option>
-                            <option value="android_ctv">android_ctv</option>
-                          </>
-                        )}
-                        {processValues.os_type === "Roku" && (
-                          <>
-                            <option value="roku_al">roku_al Hardmask</option>
-                            <option value="roku_number">roku_number</option>
-                          </>
-                        )}
-                        {processValues.os_type === "Fire TV" && (
-                          <>
-                            <option value="fire_ctv">fire_ctv</option>
-                          </>
-                        )}
-                        {processValues.os_type === "Tizen" && (
-                          <>
-                            <option value="all_tizen">all_tizen</option>
-                          </>
-                        )}
-                      </select>
-                    </div>
-
-
+                    <div className="flex flex-col sm:col-span-6">
+  <label
+    htmlFor="all_hardmask"
+    className="block text-sm p-1 font-bold leading-6 textwhite"
+  >
+    All Hardmask Type
+  </label>
+  <select
+    id="all_hardmask"
+    name="all_hardmask"
+    value={processValues.hardmask_type}
+    onChange={handleAllHardmask}
+    className="block w-full rounded-md border-0 py-2 gray700 textwhite shadow-sm sm:max-w-xs sm:text-sm sm:leading-6"
+  >
+    <option value="">Select All Hardmask</option>
+    {processValues.os_type && (() => {
+      const selectedOS = osList.find(os => os.name === processValues.os_type);
+      if (selectedOS && Array.isArray(selectedOS.hardmask_types)) {
+        return selectedOS.hardmask_types.map((type) => (
+          <option key={type} value={type}>
+            {type}
+          </option>
+        ));
+      }
+      return null;
+    })()}
+  </select>
+</div>
                   </>
                 )}
 

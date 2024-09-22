@@ -28,7 +28,13 @@ export default function UA() {
   const [osToDelete, setOsToDelete] = useState(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [osUaDownload, setosUaDownload] = useState('')
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [showOSEditPopup, setShowOSEditPopup] = useState(false);
+  
+  const [editingOSData, setEditingOSData] = useState({
+    id: '',
+    name: '',
+    hardmask_types: ['']
+  });
   const [inputData, setInputData] = useState({
     device_model: "",
     device_make: "",
@@ -37,6 +43,7 @@ export default function UA() {
   });
   const [editingOS, setEditingOS] = useState(null);
   const [editedOSName, setEditedOSName] = useState("");
+  const [hardmaskTypes, setHardmaskTypes] = useState([""]);
 
   useEffect(() => {
     axios
@@ -103,10 +110,126 @@ export default function UA() {
     setNewUA(value);
   };
 
-  const handleEditOS = (item) => {
-    setEditingOS(item.id);
-    setEditedOSName(item.name);
+  const addHardmaskType = () => {
+    setHardmaskTypes([...hardmaskTypes, ""]);
   };
+
+  const removeHardmaskType = (index) => {
+    if (hardmaskTypes.length > 1) {
+      const newHardmaskTypes = hardmaskTypes.filter((_, i) => i !== index);
+      setHardmaskTypes(newHardmaskTypes);
+    }
+  };
+
+  const handleHardmaskTypeChange = (index, value) => {
+    const newHardmaskTypes = [...hardmaskTypes];
+    newHardmaskTypes[index] = value;
+    setHardmaskTypes(newHardmaskTypes);
+  };
+
+  const addOSEditHardmaskType = () => {
+    setEditingOSData(prevData => ({
+      ...prevData,
+      hardmask_types: [...prevData.hardmask_types, '']
+    }));
+  };
+
+  const handleEditOS = (item) => {
+    setEditingOSData({
+      id: item.id,
+      name: item.name,
+      hardmask_types: [] 
+    });
+    setShowOSEditPopup(true);
+    fetchOSData(item.id);
+  };
+  
+  const fetchOSData = (id) => {
+    setIsLoading(true);
+    axios.get(`${process.env.REACT_APP_API_URI}/get-os/${id}`, {
+      headers: {
+        Authorization: JSON.parse(localStorage.getItem("token")),
+      },
+    })
+    .then((response) => {
+      const data = response.data;
+      let parsedHardmaskTypes;
+      try {
+        parsedHardmaskTypes = JSON.parse(data.hardmask_type);
+      } catch (error) {
+        console.error("Error parsing hardmask_type:", error);
+        parsedHardmaskTypes = [];
+      }
+      
+      setEditingOSData(prevData => ({
+        ...prevData,
+        name: data.name,
+        hardmask_types: Array.isArray(parsedHardmaskTypes) && parsedHardmaskTypes.length > 0 
+          ? parsedHardmaskTypes 
+          : [''] // Ensure there's at least one empty string
+      }));
+    })
+    .catch((error) => {
+      console.error("Error fetching OS data:", error);
+      alert("Error fetching OS data");
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
+  };
+
+  const handleOSEditInputChange = (field, value) => {
+    setEditingOSData({ ...editingOSData, [field]: value });
+  };
+
+  const handleOSEditHardmaskChange = (index, value) => {
+    const newHardmaskTypes = [...editingOSData.hardmask_types];
+    newHardmaskTypes[index] = value;
+    setEditingOSData({ ...editingOSData, hardmask_types: newHardmaskTypes });
+  };
+
+
+  const removeOSEditHardmaskType = (index) => {
+    setEditingOSData(prevData => {
+      const newHardmaskTypes = prevData.hardmask_types.filter((_, i) => i !== index);
+      return {
+        ...prevData,
+        hardmask_types: newHardmaskTypes.length > 0 ? newHardmaskTypes : ['']
+      };
+    });
+  };
+
+  const handleSaveOSEdit = () => {
+    setIsLoading(true);
+    axios.post(
+      `${process.env.REACT_APP_API_URI}/edit-os/${editingOSData.id}`,
+      {
+        name: editingOSData.name,
+        hardmask_type: editingOSData.hardmask_types.filter(type => type.trim() !== ""),
+      },
+      {
+        headers: {
+          Authorization: JSON.parse(localStorage.getItem("token")),
+        },
+      }
+    )
+    .then((response) => {
+      const updatedDataList = dataList.map((os) =>
+        os.id === editingOSData.id ? { ...os, name: editingOSData.name } : os
+      );
+      setDataList(updatedDataList);
+      setShowOSEditPopup(false);
+      alert("OS updated successfully");
+    })
+    .catch((error) => {
+      console.error("There was an error updating the OS!", error);
+      alert("Error updating OS");
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
+  };
+
 
   const handleCancelEdit = () => {
     setEditingOS(null);
@@ -181,6 +304,8 @@ export default function UA() {
         `${process.env.REACT_APP_API_URI}/create-os`,
         {
           name: newOS,
+          hardmask_types: hardmaskTypes.filter(type => type.trim() !== ""),
+
         },
         {
           headers: {
@@ -439,6 +564,35 @@ export default function UA() {
             onChange={(e) => setNewOS(e.target.value)}
           />
         </div>
+
+        <div className="mt-4">
+          <label className="lable">Add All HardMask Types</label>
+          {hardmaskTypes.map((type, index) => (
+            <div key={index} className="flex items-center mt-2">
+              <input
+                className="input flex-grow"
+                value={type}
+                onChange={(e) => handleHardmaskTypeChange(index, e.target.value)}
+                placeholder={`HardMask Type ${index + 1}`}
+              />
+              {index === hardmaskTypes.length - 1 ? (
+                <button
+                  className='bg-blue-500 text-white px-2 p-1 rounded-lg ml-2'
+                  onClick={addHardmaskType}
+                >
+                  <FaPlus />
+                </button>
+              ) : (
+                <button
+                  className='bg-red-500 text-white px-2 p-1 rounded-lg ml-2'
+                  onClick={() => removeHardmaskType(index)}
+                >
+                  <FaMinus />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
         <div className="mt-4 flex justify-center">
           <button
             onClick={handleAddOS}
@@ -491,13 +645,13 @@ export default function UA() {
                       </>
                     ) : (
                       <>
-                        <button
-                          onClick={() => handleEditOS(item)}
-                          className="mr-2 bg-yellow-500 hover:bg-yellow-700 hover:scale-110 text-white font-bold py-1 px-2 rounded"
-                          title="Edit OS"
-                        >
-                          <FaEdit />
-                        </button>
+                  <button
+  onClick={() => handleEditOS(item)}
+  className="mr-2 bg-yellow-500 hover:bg-yellow-700 hover:scale-110 text-white font-bold py-1 px-2 rounded"
+  title="Edit OS"
+>
+  <FaEdit />
+</button>
                         <button
                           onClick={() => handleDeleteOS(item)}
                           className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded transition duration-300 ease-in-out relative"
@@ -859,6 +1013,88 @@ export default function UA() {
           </div>
         </div>
       )}
+
+{showOSEditPopup && (
+  <div className="fixed inset-0 bg-gray-700 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+    <div className="graybg p-5 rounded-lg w-full max-w-md">
+      <h2 className="text-xl font-bold textwhite mb-4">Edit Operating System</h2>
+      {isLoding ? (
+        <div className="text-center">
+          <FaSpinner className="inline-block animate-spin text-white text-2xl" />
+          <p className="textwhite mt-2">Loading OS data...</p>
+        </div>
+      ) : (
+        <>
+          <div className="mb-4">
+            <label className="block textwhite text-sm font-bold mb-2" htmlFor="os-name">
+              OS Name
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 input leading-tight focus:outline-none focus:shadow-outline"
+              id="os-name"
+              type="text"
+              value={editingOSData.name}
+              onChange={(e) => handleOSEditInputChange('name', e.target.value)}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block textwhite text-sm font-bold mb-2">
+              Hardmask Types
+            </label>
+            {(editingOSData.hardmask_types.length > 0 ? editingOSData.hardmask_types : ['']).map((type, index) => (
+              <div key={index} className="flex items-center mt-2">
+                <input
+                  className="shadow appearance-none border rounded w-full py-2 px-3 input leading-tight focus:outline-none focus:shadow-outline"
+                  value={type}
+                  onChange={(e) => handleOSEditHardmaskChange(index, e.target.value)}
+                  placeholder={`HardMask Type ${index + 1}`}
+                />
+                {index === editingOSData.hardmask_types.length - 1 ? (
+                  <button
+                    className='bg-blue-500 text-white px-2 py-2 rounded-lg ml-2'
+                    onClick={addOSEditHardmaskType}
+                    type="button"
+                  >
+                    <FaPlus />
+                  </button>
+                ) : (
+                  <button
+                    className='bg-red-500 text-white px-2 py-2 rounded-lg ml-2'
+                    onClick={() => removeOSEditHardmaskType(index)}
+                    type="button"
+                  >
+                    <FaMinus />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-between">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              type="button"
+              onClick={handleSaveOSEdit}
+            >
+              Save Changes
+              {/* {isLoading && (
+                <span className="inline-block ml-2 animate-spin"><FaSpinner /></span>
+              )} */}
+            </button>
+            <button
+              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              type="button"
+              onClick={() => setShowOSEditPopup(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 }

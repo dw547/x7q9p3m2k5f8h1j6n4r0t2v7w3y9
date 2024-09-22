@@ -40,7 +40,11 @@ const EditHardmask = ({ onButtonClick }) => {
       },
     })
       .then((response) => {
-        setOsList(response.data.map(os => ({ id: os.id, name: os.name })));
+        setOsList(response.data.map(os => ({
+          id: os.id,
+          name: os.name,
+          hardmask_types: JSON.parse(os.hardmask_type)
+        })));
       })
       .catch((error) => {
         console.log(error);
@@ -211,7 +215,6 @@ const EditHardmask = ({ onButtonClick }) => {
       all_hardmask: "",
     });
   };
-
   return (
     <div className="graybg p-8 rounded-md">
       {deleteSuccess && (
@@ -355,20 +358,25 @@ const EditHardmask = ({ onButtonClick }) => {
         </label>
 
         <select
-          id="all_hardmask"
-          name="all_hardmask"
-          value={currentItem.all_hardmask}
-          onChange={handleAllHardmask}
-          className="input"
-        >
-          <option value="">Select Type</option>
-          {currentItem.os_type && osTypeOptions[currentItem.os_type] &&
-            osTypeOptions[currentItem.os_type].map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-        </select>
+  id="all_hardmask"
+  name="all_hardmask"
+  value={currentItem.all_hardmask}
+  onChange={handleAllHardmask}
+  className="input"
+>
+  <option value="">Select Type</option>
+  {currentItem.os_type && (() => {
+    const selectedOS = osList.find(os => os.name === currentItem.os_type);
+    if (selectedOS && Array.isArray(selectedOS.hardmask_types)) {
+      return selectedOS.hardmask_types.map((type) => (
+        <option key={type} value={type}>
+          {type}
+        </option>
+      ));
+    }
+    return null;
+  })()}
+</select>
       </div>
       <br />
       <div className="flex justify-center gap-4">

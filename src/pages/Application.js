@@ -26,14 +26,6 @@ function Application() {
     all_hardmask: "",
   });
 
-  // Hardcoded select type options
-  const osTypeOptions = {
-    iOS: ["apple_ctv", "apple_inapp"],
-    Android: ["android_inapp", "android_ctv", "android_inapp_ua"],
-    Roku: ["roku_al", "roku_number"],
-    "Fire TV": ["fire_ctv"],
-    Tizen: ["all_tizen"],
-  };
 
   useEffect(() => {
     const storedData = localStorage.getItem("appValue");
@@ -47,7 +39,12 @@ function Application() {
       },
     })
       .then((response) => {
-        setOsList(response.data.map(os => ({ id: os.id, name: os.name })));
+        setOsList(response.data.map(os => ({
+          id: os.id,
+          name: os.name,
+          hardmask_types: JSON.parse(os.hardmask_type)
+        })));
+        console.log(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -395,20 +392,25 @@ function Application() {
             Select Type
           </label>
           <select
-            id="all_hardmask"
-            name="all_hardmask"
-            value={appValue.all_hardmask}
-            onChange={handleAllHardmask}
-            className="dropdown"
-          >
-            <option value="">Select Type</option>
-            {appValue.os_type && osTypeOptions[appValue.os_type] &&
-              osTypeOptions[appValue.os_type].map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-          </select>
+  id="all_hardmask"
+  name="all_hardmask"
+  value={appValue.all_hardmask}
+  onChange={handleAllHardmask}
+  className="dropdown"
+>
+  <option value="">Select Type</option>
+  {appValue.os_type && (() => {
+    const selectedOS = osList.find(os => os.name === appValue.os_type);
+    if (selectedOS && Array.isArray(selectedOS.hardmask_types)) {
+      return selectedOS.hardmask_types.map((type) => (
+        <option key={type} value={type}>
+          {type}
+        </option>
+      ));
+    }
+    return null;
+  })()}
+</select>
                 </div>
               </div>
   
