@@ -117,7 +117,14 @@ export default function CopyProcess() {
       .then((response) => {
         const processData = response.data;
         console.log("Process Data:", processData);
-        setProcessValues(processData);
+        setProcessValues({
+          ...processData,
+          usp_enabled: !!processData.usp,
+          gdpr_enabled: !!processData.gdpr,
+          gdpr_c_enabled: !!processData.gdpr_c,
+          dnt_enabled: !!processData.dnt,
+          schain_enabled: !!processData.schain,
+        });
         setHardmaskList(processData.hardmask || []);
         setIsRTBChecked(processData.rtb || false);
         setSelectedServer(processData.server_list?.server_name || "");
