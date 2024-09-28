@@ -1110,6 +1110,7 @@ export default function Process() {
                         <option value="webshare">webshare</option>
                         <option value="pxs">pxs</option>
                         <option value="pxs+luna">pxs+luna</option>
+                        <option value="ninep">ninep</option>
 
                       </select>
                     </div>

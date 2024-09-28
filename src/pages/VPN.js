@@ -6,6 +6,7 @@ const vpnOptions = [
   { name: "nine22" },
   { name: "luna" },
   { name: "pxs" },
+  {name:"ninep"}
 ];
 
 export default function VPN() {
